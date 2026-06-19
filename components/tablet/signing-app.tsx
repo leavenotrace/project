@@ -150,6 +150,15 @@ export function SigningApp() {
               </button>
             ))}
           </div>
+
+          <a
+            href="/screen"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-1 self-center text-xs text-muted-foreground/70 underline-offset-4 transition-colors hover:text-primary hover:underline"
+          >
+            打开大屏展示页
+          </a>
         </section>
       )}
 
