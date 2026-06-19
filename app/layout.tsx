@@ -1,17 +1,22 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Noto_Sans_SC, Noto_Serif_SC } from 'next/font/google'
 import './globals.css'
 
-const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] })
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
+const notoSans = Noto_Sans_SC({
+  variable: '--font-sans',
   subsets: ['latin'],
+  weight: ['400', '500', '700'],
+})
+const notoSerif = Noto_Serif_SC({
+  variable: '--font-heading',
+  subsets: ['latin'],
+  weight: ['500', '700', '900'],
 })
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: '毕业签名树 · 现场互动',
+  description: '毕业典礼现场签名互动，每一个签名化作一片树叶飞向毕业之树',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -46,7 +51,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html
+      lang="zh-CN"
+      className={`light ${notoSans.variable} ${notoSerif.variable} bg-background`}
+    >
       <body className="font-sans antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
