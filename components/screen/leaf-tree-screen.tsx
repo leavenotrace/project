@@ -33,13 +33,40 @@ type PlacedLeaf = LeafData & {
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json())
 
-// 树冠区域内随机生成落点（椭圆范围）
-function randomCanopyPoint() {
-  const angle = Math.random() * Math.PI * 2
-  const r = Math.sqrt(Math.random())
-  const x = 50 + Math.cos(angle) * r * 32
-  const y = 34 + Math.sin(angle) * r * 24
-  return { x, y }
+// 树冠落点参数（百分比坐标）—— 覆盖整个树冠椭圆
+const CANOPY = { cx: 50, cy: 34, rx: 40, ry: 31 }
+const GOLDEN_ANGLE = Math.PI * (3 - Math.sqrt(5)) // ≈137.5°
+
+// 简单确定性哈希：同一 id 永远得到同一抖动
+function hash01(n: number) {
+  const x = Math.sin(n * 12.9898) * 43758.5453
+  return x - Math.floor(x)
+}
+
+// 基数反演（Van der Corput，base 2）：低差异序列，少量点也能均匀铺满
+function radicalInverse(i: number) {
+  let bits = i + 1
+  let r = 0
+  let f = 0.5
+  while (bits > 0) {
+    r += (bits & 1) * f
+    bits >>= 1
+    f /= 2
+  }
+  return r
+}
+
+// 落点：半径用低差异序列、角度用黄金角，使任意数量的树叶都均匀散布整个树冠
+function canopyPoint(index: number, id: number) {
+  const r = Math.sqrt(radicalInverse(index)) // 全程铺满，而非中心向外堆
+  const angle = index * GOLDEN_ANGLE
+  const jx = (hash01(id) - 0.5) * 2.6
+  const jy = (hash01(id + 7) - 0.5) * 2.6
+  return {
+    x: CANOPY.cx + Math.cos(angle) * r * CANOPY.rx + jx,
+    y: CANOPY.cy + Math.sin(angle) * r * CANOPY.ry + jy,
+    rotation: (hash01(id + 3) - 0.5) * 36,
+  }
 }
 
 const LEAF_HUES = [110, 125, 95, 140, 80]
@@ -82,19 +109,23 @@ export function LeafTreeScreen({
     if (maxId > sinceRef.current) sinceRef.current = maxId
 
     const isInitial = leaves.length === 0
-    const placed: PlacedLeaf[] = data.leaves.map((l, i) => {
-      const pt = randomCanopyPoint()
-      return {
-        ...l,
-        targetX: pt.x,
-        targetY: pt.y,
-        rotation: Math.random() * 60 - 30,
-        hue: LEAF_HUES[i % LEAF_HUES.length],
-        flying: !isInitial,
-      }
-    })
+    let placed: PlacedLeaf[] = []
 
-    setLeaves((prev) => [...prev, ...placed])
+    setLeaves((prev) => {
+      placed = data.leaves.map((l, i) => {
+        const seq = prev.length + i // 全局签名序号，决定稳定落点
+        const pt = canopyPoint(seq, l.id)
+        return {
+          ...l,
+          targetX: pt.x,
+          targetY: pt.y,
+          rotation: pt.rotation,
+          hue: LEAF_HUES[seq % LEAF_HUES.length],
+          flying: !isInitial,
+        }
+      })
+      return [...prev, ...placed]
+    })
 
     // 新签名：播放飞入动画 + 顶部播报最新一位
     if (!isInitial) {
@@ -247,27 +278,27 @@ function Leaf({ leaf }: { leaf: PlacedLeaf }) {
           />
         </svg>
         <div
-          className="-mt-1 w-32 rounded-lg border bg-card/95 px-2 py-1.5 shadow-md backdrop-blur-sm"
+          className="-mt-1 w-24 rounded-md border bg-card/95 px-1.5 py-1 shadow-md backdrop-blur-sm"
           style={{ borderColor: `oklch(0.62 0.13 ${leaf.hue} / 0.6)` }}
         >
-          <div className="flex items-baseline justify-center gap-1">
-            <span className="font-heading text-base font-bold leading-none text-primary">
+          <div className="flex items-baseline justify-center gap-0.5">
+            <span className="font-heading text-xs font-bold leading-none text-primary">
               {leaf.name}
             </span>
             {leaf.gender && (
-              <span className="text-[11px] leading-none text-muted-foreground">
+              <span className="text-[9px] leading-none text-muted-foreground">
                 {leaf.gender}
               </span>
             )}
           </div>
-          <p className="mt-1 truncate text-center text-[10px] leading-tight text-muted-foreground">
+          <p className="mt-0.5 truncate text-center text-[8px] leading-tight text-muted-foreground">
             {leaf.college}
           </p>
-          <div className="mt-1 rounded bg-secondary/70 px-1 py-0.5">
+          <div className="mt-0.5 rounded-sm bg-secondary/70 px-0.5">
             <img
               src={leaf.signatureImage || '/placeholder.svg'}
               alt={`${leaf.name}的签名`}
-              className="h-7 w-full object-contain"
+              className="h-5 w-full object-contain"
             />
           </div>
         </div>
