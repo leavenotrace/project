@@ -1,3 +1,4 @@
+import { getTreeConfig } from '@/app/actions/config'
 import { db } from '@/lib/db'
 import { signatures, students } from '@/lib/db/schema'
 import { asc, gt, sql } from 'drizzle-orm'
@@ -33,6 +34,8 @@ export async function GET(request: Request) {
     .select({ totalSignatures: sql<number>`count(*)::int` })
     .from(signatures)
 
+  const config = await getTreeConfig()
+
   return NextResponse.json({
     leaves: newLeaves,
     stats: {
@@ -40,5 +43,6 @@ export async function GET(request: Request) {
       signedStudents: totals?.signedStudents ?? 0,
       totalSignatures: sig?.totalSignatures ?? 0,
     },
+    config,
   })
 }

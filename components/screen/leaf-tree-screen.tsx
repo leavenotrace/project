@@ -2,6 +2,7 @@
 
 import useSWR from 'swr'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import type { TreeConfig } from '@/app/actions/config'
 
 type LeafData = {
   id: number
@@ -17,6 +18,7 @@ type ApiResponse = {
     signedStudents: number
     totalSignatures: number
   }
+  config?: TreeConfig
 }
 
 type PlacedLeaf = LeafData & {
@@ -41,7 +43,11 @@ function randomCanopyPoint() {
 
 const LEAF_HUES = [110, 125, 95, 140, 80]
 
-export function LeafTreeScreen() {
+export function LeafTreeScreen({
+  initialConfig,
+}: {
+  initialConfig: TreeConfig
+}) {
   const sinceRef = useRef(0)
   const [leaves, setLeaves] = useState<PlacedLeaf[]>([])
   const [stats, setStats] = useState({
@@ -49,6 +55,7 @@ export function LeafTreeScreen() {
     signedStudents: 0,
     totalSignatures: 0,
   })
+  const [config, setConfig] = useState<TreeConfig>(initialConfig)
   const [banner, setBanner] = useState<LeafData | null>(null)
   const bannerTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -67,6 +74,7 @@ export function LeafTreeScreen() {
   useEffect(() => {
     if (!data) return
     setStats(data.stats)
+    if (data.config) setConfig(data.config)
     if (data.leaves.length === 0) return
 
     const maxId = data.leaves[data.leaves.length - 1].id
@@ -110,7 +118,7 @@ export function LeafTreeScreen() {
       <header className="absolute left-0 right-0 top-0 z-20 flex items-start justify-between p-8">
         <div>
           <h1 className="font-heading text-4xl font-black text-primary md:text-5xl">
-            毕业签名树
+            {config.treeName}
           </h1>
           <p className="mt-1 text-lg text-muted-foreground">
             每一片树叶，都是一段青春的落款
@@ -127,7 +135,7 @@ export function LeafTreeScreen() {
       <div className="absolute inset-0 flex items-end justify-center">
         <div className="relative aspect-square h-full max-h-[92vh]">
           <img
-            src="/graduation-tree.png"
+            src={config.treeBackground || '/graduation-tree.png'}
             alt="毕业之树"
             className="absolute inset-0 h-full w-full object-contain"
           />

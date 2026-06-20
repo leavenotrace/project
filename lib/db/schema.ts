@@ -32,5 +32,14 @@ export const signatures = pgTable('signatures', {
     .defaultNow(),
 })
 
+export const appConfig = pgTable('app_config', {
+  key: text('key').primaryKey(),
+  value: text('value'),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+})
+
 export type Student = typeof students.$inferSelect
 export type Signature = typeof signatures.$inferSelect
+export type AppConfig = typeof appConfig.$inferSelect
