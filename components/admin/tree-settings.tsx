@@ -6,11 +6,20 @@ import {
   updateTreeName,
   type TreeConfig,
 } from '@/app/actions/config'
+import { clearAllSignatures } from '@/app/actions/admin'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card } from '@/components/ui/card'
-import { ImageIcon, Loader2, Upload } from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { ImageIcon, Loader2, Trash2, Upload } from 'lucide-react'
 
 export function TreeSettings({
   passcode,
@@ -26,6 +35,20 @@ export function TreeSettings({
   const [uploading, setUploading] = useState(false)
   const [bgMsg, setBgMsg] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
+  const [clearing, setClearing] = useState(false)
+  const [clearMsg, setClearMsg] = useState('')
+  const [clearOpen, setClearOpen] = useState(false)
+
+  async function handleClearAll() {
+    setClearing(true)
+    setClearMsg('')
+    const res = await clearAllSignatures(passcode)
+    setClearing(false)
+    setClearOpen(false)
+    setClearMsg(
+      res.ok ? '已清空全部签名记录，大屏将在数秒内恢复空树' : '清空失败',
+    )
+  }
 
   async function saveName() {
     setSavingName(true)
@@ -165,6 +188,58 @@ export function TreeSettings({
             </p>
           </div>
         </div>
+      </Card>
+
+      {/* 危险操作区 */}
+      <Card className="border-destructive/40 p-6">
+        <h2 className="font-heading text-lg font-bold text-destructive">
+          清空签名记录
+        </h2>
+        <p className="mb-4 mt-1 text-sm text-muted-foreground">
+          删除全部已签名记录并将所有学生的已签次数归零，大屏会恢复为空树。常用于测试结束或典礼正式开始前重置。此操作不可撤销，学生名单不受影响。
+        </p>
+        <Button
+          variant="destructive"
+          className="w-fit"
+          onClick={() => setClearOpen(true)}
+        >
+          <Trash2 className="mr-2 h-4 w-4" />
+          清空全部签名记录
+        </Button>
+        <Dialog open={clearOpen} onOpenChange={setClearOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>确认清空全部签名记录？</DialogTitle>
+              <DialogDescription>
+                将删除所有签名并把每位学生的已签次数重置为 0，大屏上的所有树叶会消失。学生名单本身不会被删除。此操作无法撤销。
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setClearOpen(false)}
+                disabled={clearing}
+              >
+                取消
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleClearAll}
+                disabled={clearing}
+              >
+                {clearing ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Trash2 className="mr-2 h-4 w-4" />
+                )}
+                {clearing ? '清空中…' : '确认清空'}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        {clearMsg && (
+          <p className="mt-3 text-sm text-muted-foreground">{clearMsg}</p>
+        )}
       </Card>
     </div>
   )

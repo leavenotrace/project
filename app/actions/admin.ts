@@ -138,3 +138,11 @@ export async function resetStudentSign(passcode: string, id: number) {
     .where(eq(students.id, id))
   return { ok: true as const }
 }
+
+// 清空全部签名记录并重置所有学生的已签次数（测试 / 典礼前重置用）
+export async function clearAllSignatures(passcode: string) {
+  await assertAuthed(passcode)
+  await db.delete(signatures)
+  await db.update(students).set({ signedCount: sql`0` })
+  return { ok: true as const }
+}
