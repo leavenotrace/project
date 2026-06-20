@@ -1,7 +1,7 @@
 import { getTreeConfig } from '@/app/actions/config'
 import { db } from '@/lib/db'
 import { signatures, students } from '@/lib/db/schema'
-import { asc, gt, sql } from 'drizzle-orm'
+import { asc, eq, gt, sql } from 'drizzle-orm'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -16,9 +16,11 @@ export async function GET(request: Request) {
       id: signatures.id,
       name: signatures.name,
       college: signatures.college,
+      gender: students.gender,
       signatureImage: signatures.signatureImage,
     })
     .from(signatures)
+    .leftJoin(students, eq(signatures.studentId, students.id))
     .where(gt(signatures.id, since))
     .orderBy(asc(signatures.id))
     .limit(100)

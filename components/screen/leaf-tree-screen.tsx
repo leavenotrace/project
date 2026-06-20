@@ -8,6 +8,7 @@ type LeafData = {
   id: number
   name: string
   college: string | null
+  gender: string | null
   signatureImage: string
 }
 
@@ -159,6 +160,11 @@ export function LeafTreeScreen({
             <div>
               <p className="font-heading text-2xl font-bold text-primary">
                 {banner.name}
+                {banner.gender && (
+                  <span className="ml-2 text-base font-normal text-muted-foreground">
+                    {banner.gender}
+                  </span>
+                )}
               </p>
               <p className="text-sm text-muted-foreground">
                 {banner.college} · 已签名
@@ -224,7 +230,7 @@ function Leaf({ leaf }: { leaf: PlacedLeaf }) {
       <div className="relative flex flex-col items-center">
         <svg
           viewBox="0 0 40 48"
-          className="h-12 w-10 drop-shadow"
+          className="h-8 w-7 drop-shadow"
           aria-hidden="true"
         >
           <path
@@ -240,12 +246,30 @@ function Leaf({ leaf }: { leaf: PlacedLeaf }) {
             fill="none"
           />
         </svg>
-        <div className="-mt-1 max-w-16 rounded bg-card/85 px-1.5 py-0.5">
-          <img
-            src={leaf.signatureImage || '/placeholder.svg'}
-            alt={`${leaf.name}的签名`}
-            className="h-5 w-full object-contain"
-          />
+        <div
+          className="-mt-1 w-32 rounded-lg border bg-card/95 px-2 py-1.5 shadow-md backdrop-blur-sm"
+          style={{ borderColor: `oklch(0.62 0.13 ${leaf.hue} / 0.6)` }}
+        >
+          <div className="flex items-baseline justify-center gap-1">
+            <span className="font-heading text-base font-bold leading-none text-primary">
+              {leaf.name}
+            </span>
+            {leaf.gender && (
+              <span className="text-[11px] leading-none text-muted-foreground">
+                {leaf.gender}
+              </span>
+            )}
+          </div>
+          <p className="mt-1 truncate text-center text-[10px] leading-tight text-muted-foreground">
+            {leaf.college}
+          </p>
+          <div className="mt-1 rounded bg-secondary/70 px-1 py-0.5">
+            <img
+              src={leaf.signatureImage || '/placeholder.svg'}
+              alt={`${leaf.name}的签名`}
+              className="h-7 w-full object-contain"
+            />
+          </div>
         </div>
       </div>
     </div>
