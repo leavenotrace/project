@@ -143,6 +143,11 @@ export function SigningApp() {
                   <p className="truncate text-sm text-muted-foreground">
                     {s.college} · {s.studentNo}
                   </p>
+                  {s.studyPeriod && (
+                    <p className="truncate text-xs text-muted-foreground/80">
+                      在校时间：{s.studyPeriod}
+                    </p>
+                  )}
                 </div>
                 <span className="shrink-0 rounded-full bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
                   去签名
@@ -171,6 +176,7 @@ export function SigningApp() {
               </p>
               <p className="text-sm text-muted-foreground">
                 {selected.college} · {selected.studentNo}
+                {selected.studyPeriod ? ` · 在校 ${selected.studyPeriod}` : ''}
               </p>
             </div>
             <Button

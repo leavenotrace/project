@@ -12,6 +12,7 @@ export const students = pgTable('students', {
   college: text('college').notNull(),
   studentNo: text('student_no').notNull().unique(),
   gender: text('gender'),
+  studyPeriod: text('study_period'),
   signedCount: integer('signed_count').notNull().default(0),
   createdAt: timestamp('created_at', { withTimezone: true })
     .notNull()

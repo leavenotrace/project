@@ -10,6 +10,7 @@ export type SearchResult = {
   college: string
   studentNo: string
   gender: string | null
+  studyPeriod: string | null
   signedCount: number
 }
 
@@ -25,6 +26,7 @@ export async function searchStudents(query: string): Promise<SearchResult[]> {
       college: students.college,
       studentNo: students.studentNo,
       gender: students.gender,
+      studyPeriod: students.studyPeriod,
       signedCount: students.signedCount,
     })
     .from(students)
