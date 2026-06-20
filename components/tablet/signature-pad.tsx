@@ -33,7 +33,7 @@ export function SignaturePad({ onSave, disabled }: SignaturePadProps) {
     ctx.scale(ratio, ratio)
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
-    ctx.lineWidth = 4
+    ctx.lineWidth = 15
     ctx.strokeStyle = '#1f3d2b'
   }, [])
 
@@ -68,6 +68,10 @@ export function SignaturePad({ onSave, disabled }: SignaturePadProps) {
     const ctx = canvasRef.current?.getContext('2d')
     if (!ctx || !lastPoint.current) return
     const p = getPoint(e)
+    // 速度感应：移动慢→线粗，移动快→线细，形成自然的毛笔笔锋
+    const dist = Math.hypot(p.x - lastPoint.current.x, p.y - lastPoint.current.y)
+    const width = Math.max(10, 19 - dist * 0.5)
+    ctx.lineWidth = width
     ctx.beginPath()
     ctx.moveTo(lastPoint.current.x, lastPoint.current.y)
     ctx.lineTo(p.x, p.y)
