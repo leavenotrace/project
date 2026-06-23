@@ -101,9 +101,9 @@ export function LeafTreeScreen({
 
   useEffect(() => {
     if (!data) return
-    setStats(data.stats)
+    if (data.stats) setStats(data.stats)
     if (data.config) setConfig(data.config)
-    if (data.leaves.length === 0) return
+    if (!data.leaves || data.leaves.length === 0) return
 
     const maxId = data.leaves[data.leaves.length - 1].id
     if (maxId > sinceRef.current) sinceRef.current = maxId
