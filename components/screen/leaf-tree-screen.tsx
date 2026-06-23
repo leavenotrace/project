@@ -149,9 +149,11 @@ export function LeafTreeScreen({
       {/* 标题 */}
       <header className="absolute left-0 right-0 top-0 z-20 flex items-start justify-between p-8">
         <div>
-          <h1 className="font-heading text-4xl font-black text-primary md:text-5xl">
-            {config.treeName}
-          </h1>
+          <img
+            src="/tree-title-calligraphy.png"
+            alt={config.treeName}
+            className="h-20 w-auto object-contain mix-blend-multiply md:h-28"
+          />
           <p className="mt-1 text-lg text-muted-foreground">
             每一片树叶，都是一段青春的落款
           </p>
