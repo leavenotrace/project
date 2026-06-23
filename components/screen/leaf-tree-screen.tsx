@@ -101,9 +101,9 @@ export function LeafTreeScreen({
 
   useEffect(() => {
     if (!data) return
-    setStats(data.stats)
+    if (data.stats) setStats(data.stats)
     if (data.config) setConfig(data.config)
-    if (data.leaves.length === 0) return
+    if (!data.leaves || data.leaves.length === 0) return
 
     const maxId = data.leaves[data.leaves.length - 1].id
     if (maxId > sinceRef.current) sinceRef.current = maxId
@@ -149,17 +149,14 @@ export function LeafTreeScreen({
       {/* 标题 */}
       <header className="absolute left-0 right-0 top-0 z-20 flex items-start justify-between p-8">
         <div>
-          <h1 className="font-heading text-4xl font-black text-primary md:text-5xl">
-            {config.treeName}
-          </h1>
+          <img
+            src="/tree-title-calligraphy.png"
+            alt={config.treeName}
+            className="h-20 w-auto object-contain mix-blend-multiply md:h-28"
+          />
           <p className="mt-1 text-lg text-muted-foreground">
             每一片树叶，都是一段青春的落款
           </p>
-        </div>
-        <div className="flex gap-4">
-          <StatCard label="已签名" value={stats.signedStudents} accent />
-          <StatCard label="毕业生" value={stats.totalStudents} />
-          <StatCard label="签名总数" value={stats.totalSignatures} />
         </div>
       </header>
 
@@ -205,35 +202,6 @@ export function LeafTreeScreen({
         </div>
       )}
     </main>
-  )
-}
-
-function StatCard({
-  label,
-  value,
-  accent,
-}: {
-  label: string
-  value: number
-  accent?: boolean
-}) {
-  return (
-    <div
-      className={`min-w-24 rounded-2xl px-5 py-3 text-center ${
-        accent
-          ? 'bg-primary text-primary-foreground'
-          : 'bg-card text-foreground'
-      }`}
-    >
-      <div className="font-heading text-3xl font-black tabular-nums">
-        {value}
-      </div>
-      <div
-        className={`text-xs ${accent ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}
-      >
-        {label}
-      </div>
-    </div>
   )
 }
 
