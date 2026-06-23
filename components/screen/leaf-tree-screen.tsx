@@ -156,11 +156,6 @@ export function LeafTreeScreen({
             每一片树叶，都是一段青春的落款
           </p>
         </div>
-        <div className="flex gap-4">
-          <StatCard label="已签名" value={stats.signedStudents} accent />
-          <StatCard label="毕业生" value={stats.totalStudents} />
-          <StatCard label="签名总数" value={stats.totalSignatures} />
-        </div>
       </header>
 
       {/* 树 + 树叶 */}
@@ -205,35 +200,6 @@ export function LeafTreeScreen({
         </div>
       )}
     </main>
-  )
-}
-
-function StatCard({
-  label,
-  value,
-  accent,
-}: {
-  label: string
-  value: number
-  accent?: boolean
-}) {
-  return (
-    <div
-      className={`min-w-24 rounded-2xl px-5 py-3 text-center ${
-        accent
-          ? 'bg-primary text-primary-foreground'
-          : 'bg-card text-foreground'
-      }`}
-    >
-      <div className="font-heading text-3xl font-black tabular-nums">
-        {value}
-      </div>
-      <div
-        className={`text-xs ${accent ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}
-      >
-        {label}
-      </div>
-    </div>
   )
 }
 
